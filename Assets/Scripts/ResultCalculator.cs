@@ -1,24 +1,48 @@
-using System;
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
+using DreamOfRedMansion.Data;
 
 namespace DreamOfRedMansion
 {
-    /// <summary>
-    /// 根據四題答案結果顯示角色與說明。
-    /// 暫時版本：僅顯示文字 Log，延遲後回到 Idle。
-    /// </summary>
     public class ResultCalculator : MonoBehaviour
     {
-        [Header("顯示時間（秒）")]
+        [Header("結果對應表")]
+        public ResultMapping resultMapping;
+
+        [Header("UI 控制器")]
+        public ScreenUIController screenUI;
+
+        [Tooltip("結果顯示秒數")]
         public float displayDuration = 20f;
 
-        public IEnumerator ShowResult(Action onComplete)
+        public IEnumerator RunResultPhase(string answerPattern, System.Action onComplete)
         {
-            Debug.Log("[ResultCalculator] 開始顯示結果（暫時以文字替代）");
+            if (string.IsNullOrEmpty(answerPattern))
+            {
+                Debug.LogWarning("[ResultCalculator] 答案組合為空！");
+                onComplete?.Invoke();
+                yield break;
+            }
+
+            Debug.Log($"[ResultCalculator] 收到答案組合：{answerPattern}");
+
+            var result = resultMapping.GetResult(answerPattern);
+            if (result == null)
+            {
+                Debug.LogWarning($"[ResultCalculator] 未找到對應結果：{answerPattern}");
+                onComplete?.Invoke();
+                yield break;
+            }
+
+            if (screenUI != null)
+                screenUI.UpdateResultContent(result.characterName, result.description, result.resultImage);
+
+            Debug.Log($"[ResultCalculator] 顯示角色：{result.characterName}");
+
             yield return new WaitForSeconds(displayDuration);
-            Debug.Log("[ResultCalculator] 結果階段結束 → 回 Idle");
             onComplete?.Invoke();
         }
+
     }
 }

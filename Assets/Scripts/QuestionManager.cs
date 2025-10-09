@@ -1,63 +1,90 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using DreamOfRedMansion.Data;
+using System.Collections.Generic;
 
 namespace DreamOfRedMansion
 {
     public class QuestionManager : MonoBehaviour
     {
-        [Header("題庫來源")]
+        [Header("題庫")]
         public QuestionSet questionSet;
 
-        [Header("答題時間限制（秒）")]
+        [Header("UI 控制器")]
+        public QuestionPanelController questionPanelController;
+
+        [Header("每題答題時間")]
         public float questionDuration = 10f;
 
-        private List<QuestionData> _currentQuestions;
-        private int _currentIndex = 0;
+        // 改成字串儲存答案（例如 "1010"）
+        [NonSerialized]
+        public string collectedAnswers = "";
 
+        private List<QuestionData> _questions;
+
+        bool answer = false;
         public IEnumerator RunQuestionFlow(Action onComplete)
         {
             if (questionSet == null)
             {
-                Debug.LogError("未指定題庫 QuestionSet！");
+                Debug.LogError("[QuestionManager] 未指定題庫！");
                 yield break;
             }
 
-            _currentQuestions = questionSet.GetRandomQuestions(4);
-            _currentIndex = 0;
+            _questions = questionSet.questions; // 固定四題依序
+            collectedAnswers = "";
 
-            Debug.Log($"[QuestionManager] 啟動答題階段，共 {_currentQuestions.Count} 題。");
-
-            while (_currentIndex < _currentQuestions.Count)
+            Debug.Log($"[QuestionManager] 啟動題目階段，共 {_questions.Count} 題。");
+            for (int i = 0; i < _questions.Count; i++)
             {
-                var q = _currentQuestions[_currentIndex];
-                Debug.Log($"[Question] 第{_currentIndex + 1}題：{q.questionText}");
-
-                yield return StartCoroutine(AskQuestion(q));
-
-                _currentIndex++;
+                yield return StartCoroutine(AskQuestion(_questions[i]));
             }
 
-            Debug.Log("[QuestionManager] 所有題目完成。");
+            Debug.Log($"[QuestionManager] 所有題目完成 → 答案組合：{collectedAnswers}");
             onComplete?.Invoke();
         }
 
         private IEnumerator AskQuestion(QuestionData question)
         {
-            // 顯示題目（未接UI，先印Log）
-            Debug.Log($"顯示題目：{question.questionText}");
-
-            float timer = 0f;
-            while (timer < questionDuration)
+            questionPanelController.ShowQuestion(question);
+            if (!question.isCutcene)
             {
-                timer += Time.deltaTime;
-                yield return null;
-            }
+                answer = false;
+                yield return new WaitForSeconds(questionDuration);
 
-            // 時間到，鎖定答案（這裡暫不實作圈叉判斷）
-            Debug.Log($"[Question] 時間到，自動鎖定答案（待整合腳部偵測）");
+                if (question.isRecord)
+                {
+                    collectedAnswers += answer ? "1" : "0";
+                    Debug.Log($"[QuestionManager] 題目「{question.questionTitle}」答案：{(answer ? "是" : "否")} (已記錄)");
+                }
+                else
+                {
+                    Debug.Log($"[QuestionManager] 題目「{question.questionTitle}」答案：{(answer ? "是" : "否")} (未記錄)");
+                }
+            }
+            else
+            {
+                Debug.Log($"[QuestionManager] 顯示過場：「{question.questionTitle}」");
+                yield return new WaitForSeconds(questionDuration);
+            }
+        }
+        public void SetAnswer(bool value)
+        {
+            answer = value;
+        }
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.O))
+            {
+                answer = true;
+                Debug.Log($"answer:{answer}");
+            }
+            if (Input.GetKeyDown(KeyCode.X))
+            {
+                answer = false;
+                Debug.Log($"answer:{answer}");
+            }
         }
     }
 }

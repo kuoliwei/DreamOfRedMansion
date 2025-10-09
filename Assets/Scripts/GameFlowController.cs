@@ -14,6 +14,9 @@ namespace DreamOfRedMansion
 
         private GameStateMachine _stateMachine;
 
+        [Header("Idle 狀態影片播放器")]
+        public IdleVideoPlayer idleVideoPlayer;
+
         private void Awake()
         {
             _stateMachine = new GameStateMachine();
@@ -22,6 +25,10 @@ namespace DreamOfRedMansion
 
         private void Start()
         {
+            // 初始化影片播放器
+            if (idleVideoPlayer != null)
+                idleVideoPlayer.Initialize(_stateMachine);
+
             EnterIdle();
         }
 
@@ -33,13 +40,18 @@ namespace DreamOfRedMansion
                     EnterIdle();
                     break;
                 case GameState.Question:
+                    screenUI.ShowQuestion(); // 新增：切換到題目畫面
                     StartCoroutine(questionManager.RunQuestionFlow(() =>
                     {
                         _stateMachine.ChangeState(GameState.Result);
                     }));
                     break;
                 case GameState.Result:
-                    StartCoroutine(resultCalculator.ShowResult(() =>
+                    // 狀態一切換 → 立即顯示結果畫面
+                    screenUI.ShowResult();
+
+                    // 由 ResultCalculator 負責填入角色內容
+                    StartCoroutine(resultCalculator.RunResultPhase(questionManager.collectedAnswers, () =>
                     {
                         _stateMachine.ChangeState(GameState.Idle);
                     }));

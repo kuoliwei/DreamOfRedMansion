@@ -15,9 +15,18 @@ namespace DreamOfRedMansion.Data
         /// </summary>
         public List<QuestionData> GetRandomQuestions(int count)
         {
-            var available = questions.Where(q => q != null && q.enabled).ToList();
+            var available = questions
+                .Where(q => q != null && q.enabled)
+                .ToList();
+
+            if (available.Count == 0)
+            {
+                Debug.LogWarning("[QuestionSet] 題庫為空或全部禁用。");
+                return new List<QuestionData>();
+            }
+
             if (available.Count <= count)
-                return available;
+                return new List<QuestionData>(available);
 
             var selected = new List<QuestionData>();
             while (selected.Count < count)
@@ -26,7 +35,30 @@ namespace DreamOfRedMansion.Data
                 if (!selected.Contains(q))
                     selected.Add(q);
             }
+
             return selected;
+        }
+
+        /// <summary>
+        /// 依序取出指定數量的題目（從題庫前方開始）
+        /// </summary>
+        public List<QuestionData> GetSequentialQuestions(int count)
+        {
+            var available = questions
+                .Where(q => q != null && q.enabled)
+                .ToList();
+
+            if (available.Count == 0)
+            {
+                Debug.LogWarning("[QuestionSet] 題庫為空或全部禁用。");
+                return new List<QuestionData>();
+            }
+
+            // 如果題目不足，直接全取
+            if (available.Count <= count)
+                return new List<QuestionData>(available);
+
+            return available.Take(count).ToList();
         }
     }
 }

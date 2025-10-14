@@ -1,3 +1,4 @@
+using DreamOfRedMansion.Core;
 using UnityEngine;
 
 namespace DreamOfRedMansion
@@ -16,6 +17,29 @@ namespace DreamOfRedMansion
         public Color questionColor = Color.blue;
         public Color resultColor = Color.red;
 
+        [Header("地板 是 或 否 狀態切換用物件")]
+        public GameObject circle_black_bg;
+        public GameObject cross_black_bg;
+
+        [Tooltip("是否輸出除錯訊息")]
+        public bool debugLog = true;
+
+        private bool _isActive = false;
+        /// <summary>
+        /// 由外部（例如 GameFlowController）呼叫，用於同步遊戲狀態。
+        /// </summary>
+        public void OnGameStateChanged(GameState newState)
+        {
+            _isActive = (newState == GameState.Question);
+            if (!_isActive)
+            {
+                circle_black_bg.SetActive(false);
+                cross_black_bg.SetActive(false);
+            }
+
+            if (debugLog)
+                Debug.Log($"[GroundEffectController] 狀態切換 → {_isActive}");
+        }
         public void SetIdle()
         {
             SetGroundColor(idleColor);
@@ -38,6 +62,23 @@ namespace DreamOfRedMansion
         {
             if (groundRenderer != null && groundRenderer.material != null)
                 groundRenderer.material.color = color;
+        }
+
+        public void selectCircle()
+        {
+            if (_isActive)
+            {
+                circle_black_bg.SetActive(true);
+                cross_black_bg.SetActive(false);
+            }
+        }
+        public void selectCross()
+        {
+            if (_isActive)
+            {
+                circle_black_bg.SetActive(false);
+                cross_black_bg.SetActive(true);
+            }
         }
     }
 }

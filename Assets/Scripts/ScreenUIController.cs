@@ -19,6 +19,8 @@ namespace DreamOfRedMansion
 
         [Header("結果畫面 UI 元件")]
         public Text resultNameText;
+        public Text resultTitleText;
+        public Text resultIntroductionText;
         public Text resultDescriptionText;
         public Image resultImage;
 
@@ -54,10 +56,16 @@ namespace DreamOfRedMansion
         /// <summary>
         /// 更新結果畫面顯示的文字與圖片內容
         /// </summary>
-        public void UpdateResultContent(string name, string description, Sprite image)
+        public void UpdateResultContent(string name, string title, string introduction, string description, Sprite image)
         {
             if (resultNameText != null)
                 resultNameText.text = name;
+
+            if (resultTitleText != null)
+                resultTitleText.text = title;
+
+            if (resultIntroductionText != null)
+                resultIntroductionText.text = introduction;
 
             if (resultDescriptionText != null)
                 resultDescriptionText.text = description;

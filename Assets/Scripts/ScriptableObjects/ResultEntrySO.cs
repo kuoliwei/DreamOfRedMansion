@@ -13,7 +13,15 @@ namespace DreamOfRedMansion.Data
         [Tooltip("角色名稱")]
         public string characterName;
 
-        [Tooltip("角色說明文字")]
+        [Tooltip("稱號")]
+        [TextArea(1, 2)]
+        public string title;
+
+        [Tooltip("簡介")]
+        [TextArea(1, 2)]
+        public string Introduction;
+
+        [Tooltip("描述")]
         [TextArea(2, 5)]
         public string description;
 

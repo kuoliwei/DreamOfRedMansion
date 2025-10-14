@@ -36,7 +36,7 @@ namespace DreamOfRedMansion
             }
 
             if (screenUI != null)
-                screenUI.UpdateResultContent(result.characterName, result.description, result.resultImage);
+                screenUI.UpdateResultContent(result.characterName, result.title, result.Introduction, result.description, result.resultImage);
 
             Debug.Log($"[ResultCalculator] ≈„•‹®§¶‚°G{result.characterName}");
 

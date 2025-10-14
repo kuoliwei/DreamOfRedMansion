@@ -13,6 +13,7 @@ namespace DreamOfRedMansion
 
         [Header("UI 控制器")]
         public QuestionPanelController questionPanelController;
+        public GroundEffectController groundEffectController;
 
         [Header("每題答題時間")]
         public float questionDuration = 10f;
@@ -71,20 +72,20 @@ namespace DreamOfRedMansion
         }
         public void SetAnswer(bool value)
         {
+            if (value)
+            {
+                groundEffectController.selectCircle();
+            }
+            else
+            {
+                groundEffectController.selectCross();
+            }
             answer = value;
+            //Debug.Log($"answer：{answer}");
         }
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.O))
-            {
-                answer = true;
-                Debug.Log($"answer:{answer}");
-            }
-            if (Input.GetKeyDown(KeyCode.X))
-            {
-                answer = false;
-                Debug.Log($"answer:{answer}");
-            }
+
         }
     }
 }

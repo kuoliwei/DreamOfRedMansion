@@ -21,8 +21,8 @@ namespace DreamOfRedMansion
             if (string.IsNullOrEmpty(answerPattern))
             {
                 Debug.LogWarning("[ResultCalculator] 答案組合為空！");
-                onComplete?.Invoke();
-                yield break;
+                //onComplete?.Invoke();
+                //yield break;
             }
 
             Debug.Log($"[ResultCalculator] 收到答案組合：{answerPattern}");
@@ -31,18 +31,20 @@ namespace DreamOfRedMansion
             if (result == null)
             {
                 Debug.LogWarning($"[ResultCalculator] 未找到對應結果：{answerPattern}");
-                onComplete?.Invoke();
-                yield break;
+                //onComplete?.Invoke();
+                //yield break;
             }
+            else
+            {
+                if (screenUI != null)
+                    screenUI.UpdateResultContent(result.characterName, result.title, result.Introduction, result.description, result.resultImage);
 
-            if (screenUI != null)
-                screenUI.UpdateResultContent(result.characterName, result.title, result.Introduction, result.description, result.resultImage);
+                Debug.Log($"[ResultCalculator] 顯示角色：{result.characterName}");
 
-            Debug.Log($"[ResultCalculator] 顯示角色：{result.characterName}");
-
-            yield return new WaitForSeconds(displayDuration);
+                yield return new WaitForSeconds(displayDuration);
+            }
+            yield return new WaitForSeconds(0.1f);
             onComplete?.Invoke();
         }
-
     }
 }

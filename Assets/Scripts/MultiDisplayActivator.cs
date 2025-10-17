@@ -1,5 +1,8 @@
+using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 /// <summary>
 /// 啟用所有連接的顯示器（Display 0 以外的 Display 1, 2, ...）
@@ -9,23 +12,37 @@ public class MultiDisplayActivator : MonoBehaviour
 {
     [SerializeField] private InputField mainCameraTargetDisplay;
     [SerializeField] private InputField mainCanvasTargetDisplay;
-    [SerializeField] private InputField leftCanvasTargetDisplay;
-    [SerializeField] private InputField rightCanvasTargetDisplay;
-    [SerializeField] private InputField groundCanvasTargetDisplay;
+    //[SerializeField] private InputField leftCanvasTargetDisplay;
+    //[SerializeField] private InputField rightCanvasTargetDisplay;
+    //[SerializeField] private InputField groundCanvasTargetDisplay;
+    [SerializeField] private InputField leftCameraTargetDisplay;
+    [SerializeField] private InputField rightCameraTargetDisplay;
+    [SerializeField] private InputField groundCameraTargetDisplay;
     [SerializeField] private Button changeGroundCameraRotation;
 
     [SerializeField] private Text currentMainCameraTargetDisplay;
     [SerializeField] private Text currentMainCanvasTargetDisplay;
-    [SerializeField] private Text currentLeftCanvasTargetDisplay;
-    [SerializeField] private Text currentRightCanvasTargetDisplay;
-    [SerializeField] private Text currentGroundCanvasTargetDisplay;
+    //[SerializeField] private Text currentLeftCanvasTargetDisplay;
+    //[SerializeField] private Text currentRightCanvasTargetDisplay;
+    //[SerializeField] private Text currentGroundCanvasTargetDisplay;
+    [SerializeField] private Text currentLeftCameraTargetDisplay;
+    [SerializeField] private Text currentRightCameraTargetDisplay;
+    [SerializeField] private Text currentGroundCameraTargetDisplay;
 
     [SerializeField] private Camera mainCamera;
     [SerializeField] private Canvas mainCanvas;
-    [SerializeField] private Canvas leftCanvas;
-    [SerializeField] private Canvas rightCanvas;
-    [SerializeField] private Canvas groundCanvas;
-    [SerializeField] private Transform groundCamera;
+    //[SerializeField] private Canvas leftCanvas;
+    //[SerializeField] private Canvas rightCanvas;
+    //[SerializeField] private Canvas groundCanvas;
+    [SerializeField] private Camera leftCamera;
+    [SerializeField] private Camera rightCamera;
+    [SerializeField] private Camera groundCamera;
+    [SerializeField] private Transform cornerGroundCameraTransform;
+
+    [SerializeField] string jsonPath = "DisplayIndexData";
+    [SerializeField] string jsonName = "DisplayIndexData.json";
+
+    [SerializeField] GameObject displayControlPanel;
 
     private int displayLength;
     private void Awake()
@@ -44,11 +61,75 @@ public class MultiDisplayActivator : MonoBehaviour
 #if UNITY_EDITOR
         displayLength = 4;
 #endif
-        currentMainCameraTargetDisplay.text = mainCamera.targetDisplay.ToString();
-        currentMainCanvasTargetDisplay.text = mainCanvas.targetDisplay.ToString();
-        currentLeftCanvasTargetDisplay.text = leftCanvas.targetDisplay.ToString();
-        currentRightCanvasTargetDisplay.text = rightCanvas.targetDisplay.ToString();
-        currentGroundCanvasTargetDisplay.text = groundCanvas.targetDisplay.ToString();
+        //currentMainCameraTargetDisplay.text = mainCamera.targetDisplay.ToString();
+        //currentMainCanvasTargetDisplay.text = mainCanvas.targetDisplay.ToString();
+        ////currentLeftCanvasTargetDisplay.text = leftCanvas.targetDisplay.ToString();
+        ////currentRightCanvasTargetDisplay.text = rightCanvas.targetDisplay.ToString();
+        ////currentGroundCanvasTargetDisplay.text = groundCanvas.targetDisplay.ToString();
+        //currentLeftCameraTargetDisplay.text = leftCamera.targetDisplay.ToString();
+        //currentRightCameraTargetDisplay.text = rightCamera.targetDisplay.ToString();
+        //currentGroundCameraTargetDisplay.text = groundCamera.targetDisplay.ToString();
+    }
+    private void Start()
+    {
+        init();
+    }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            displayControlPanel.SetActive(!displayControlPanel.activeSelf);
+        }
+    }
+    async void init()
+    {
+        DisplayIndex displayIndex = await LoadDisplayIndex(jsonPath, jsonName);
+        currentMainCameraTargetDisplay.text = displayIndex.cornerScreenCamsIndex[0].ToString();
+        currentMainCanvasTargetDisplay.text = displayIndex.uiIndex.ToString();
+        currentLeftCameraTargetDisplay.text = displayIndex.cornerScreenCamsIndex[1].ToString();
+        currentRightCameraTargetDisplay.text = displayIndex.cornerScreenCamsIndex[2].ToString();
+        currentGroundCameraTargetDisplay.text = displayIndex.cornerScreenCamsIndex[3].ToString();
+        mainCamera.targetDisplay = displayIndex.cornerScreenCamsIndex[0];
+        mainCanvas.targetDisplay = displayIndex.uiIndex;
+        leftCamera.targetDisplay = displayIndex.cornerScreenCamsIndex[1];
+        rightCamera.targetDisplay = displayIndex.cornerScreenCamsIndex[2];
+        groundCamera.targetDisplay = displayIndex.cornerScreenCamsIndex[3];
+        cornerGroundCameraTransform.transform.localEulerAngles = new Vector3(0, 0, displayIndex.groundDir);
+    }
+    public async Task<DisplayIndex> LoadDisplayIndex(string jsonPath, string jsonName)
+    {
+        string savePath = Path.Combine(Application.dataPath, jsonPath);
+        string fullPath = Path.Combine(savePath, jsonName);
+        if (!File.Exists(fullPath))
+        {
+            Debug.LogWarning($"[LoadDisplayIndex] File does not exist: {fullPath}");
+            await SaveDisplayIndexData(jsonPath, jsonName);
+        }
+        var loaded = await JsonFileUtility.LoadFromFileAsync<DisplayIndex>(savePath, jsonName);
+
+        if (!loaded.HasValue)
+        {
+            Debug.LogWarning("Failed to load calibration file.");
+            return new DisplayIndex();
+        }
+
+        return loaded.Value;
+    }
+    async Task SaveDisplayIndexData(string jsonPath, string jsonName)
+    {
+        DisplayIndex displayIndex = new DisplayIndex
+        {
+            cornerScreenCamsIndex = new[] { mainCamera.targetDisplay, leftCamera.targetDisplay, rightCamera.targetDisplay, groundCamera.targetDisplay },
+            uiIndex = mainCanvas.targetDisplay,
+            groundDir = (int)cornerGroundCameraTransform.transform.localEulerAngles.z
+        };
+        string savePath = Path.Combine(Application.dataPath, jsonPath);
+        // 儲存
+        await JsonFileUtility.SaveToFileAsync(displayIndex, savePath, jsonName);
+    }
+    void OnApplicationQuit()
+    {
+        SaveDisplayIndexData(jsonPath, jsonName);
     }
     public void SetMainCameraTargetDisplay()
     {
@@ -78,52 +159,94 @@ public class MultiDisplayActivator : MonoBehaviour
             mainCanvasTargetDisplay.text = "輸入錯誤";
         }
     }
-    public void SetLeftCanvasTargetDisplay()
+    //public void SetLeftCanvasTargetDisplay()
+    //{
+    //    Debug.Log(displayLength);
+    //    if (int.TryParse(leftCanvasTargetDisplay.text, out int target) && target < displayLength)
+    //    {
+    //        leftCanvas.targetDisplay = target;
+    //        currentLeftCanvasTargetDisplay.text = leftCanvas.targetDisplay.ToString();
+    //        leftCanvasTargetDisplay.text = "";
+    //    }
+    //    else
+    //    {
+    //        leftCanvasTargetDisplay.text = "輸入錯誤";
+    //    }
+    //}
+    //public void SetRightCanvasTargetDisplay()
+    //{
+    //    Debug.Log(displayLength);
+    //    if (int.TryParse(rightCanvasTargetDisplay.text, out int target) && target < displayLength)
+    //    {
+    //        rightCanvas.targetDisplay = target;
+    //        currentRightCanvasTargetDisplay.text = rightCanvas.targetDisplay.ToString();
+    //        rightCanvasTargetDisplay.text = "";
+    //    }
+    //    else
+    //    {
+    //        rightCanvasTargetDisplay.text = "輸入錯誤";
+    //    }
+    //}
+    //public void SetGroundCanvasTargetDisplay()
+    //{
+    //    Debug.Log(displayLength);
+    //    if (int.TryParse(groundCanvasTargetDisplay.text, out int target) && target < displayLength)
+    //    {
+    //        groundCanvas.targetDisplay = target;
+    //        currentGroundCanvasTargetDisplay.text = groundCanvas.targetDisplay.ToString();
+    //        groundCanvasTargetDisplay.text = "";
+    //    }
+    //    else
+    //    {
+    //        groundCanvasTargetDisplay.text = "輸入錯誤";
+    //    }
+    //}
+    public void SetLeftCameraTargetDisplay()
     {
         Debug.Log(displayLength);
-        if (int.TryParse(leftCanvasTargetDisplay.text, out int target) && target < displayLength)
+        if (int.TryParse(leftCameraTargetDisplay.text, out int target) && target < displayLength)
         {
-            leftCanvas.targetDisplay = target;
-            currentLeftCanvasTargetDisplay.text = leftCanvas.targetDisplay.ToString();
-            leftCanvasTargetDisplay.text = "";
+            leftCamera.targetDisplay = target;
+            currentLeftCameraTargetDisplay.text = leftCamera.targetDisplay.ToString();
+            leftCameraTargetDisplay.text = "";
         }
         else
         {
-            leftCanvasTargetDisplay.text = "輸入錯誤";
+            leftCameraTargetDisplay.text = "輸入錯誤";
         }
     }
-    public void SetRightCanvasTargetDisplay()
+    public void SetRightCameraTargetDisplay()
     {
         Debug.Log(displayLength);
-        if (int.TryParse(rightCanvasTargetDisplay.text, out int target) && target < displayLength)
+        if (int.TryParse(rightCameraTargetDisplay.text, out int target) && target < displayLength)
         {
-            rightCanvas.targetDisplay = target;
-            currentRightCanvasTargetDisplay.text = rightCanvas.targetDisplay.ToString();
-            rightCanvasTargetDisplay.text = "";
+            rightCamera.targetDisplay = target;
+            currentRightCameraTargetDisplay.text = rightCamera.targetDisplay.ToString();
+            rightCameraTargetDisplay.text = "";
         }
         else
         {
-            rightCanvasTargetDisplay.text = "輸入錯誤";
+            rightCameraTargetDisplay.text = "輸入錯誤";
         }
     }
-    public void SetGroundCanvasTargetDisplay()
+    public void SetGroundCameraTargetDisplay()
     {
         Debug.Log(displayLength);
-        if (int.TryParse(groundCanvasTargetDisplay.text, out int target) && target < displayLength)
+        if (int.TryParse(groundCameraTargetDisplay.text, out int target) && target < displayLength)
         {
-            groundCanvas.targetDisplay = target;
-            currentGroundCanvasTargetDisplay.text = groundCanvas.targetDisplay.ToString();
-            groundCanvasTargetDisplay.text = "";
+            groundCamera.targetDisplay = target;
+            currentGroundCameraTargetDisplay.text = groundCamera.targetDisplay.ToString();
+            groundCameraTargetDisplay.text = "";
         }
         else
         {
-            groundCanvasTargetDisplay.text = "輸入錯誤";
+            groundCameraTargetDisplay.text = "輸入錯誤";
         }
     }
     public void ChangeGroundCameraRotation()
     {
-        Vector3 currentLocalEulerAngles = new Vector3(0, 0, (int)groundCamera.localEulerAngles.z + 90);
+        Vector3 currentLocalEulerAngles = new Vector3(0, 0, (int)cornerGroundCameraTransform.localEulerAngles.z + 90);
 
-        groundCamera.localEulerAngles = currentLocalEulerAngles;
+        cornerGroundCameraTransform.localEulerAngles = currentLocalEulerAngles;
     }
 }

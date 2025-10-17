@@ -17,8 +17,8 @@ MonoBehaviour:
   questionText: "\u91D1\u78A7\u8F1D\u714C\u7684\u5BAE\u6BBF\u5927\u9580\u7DE9\u7DE9\u655E\u958B\uFF0C\u6E96\u5099\u597D\u8981\u958B\u59CB\u4ECA\u5929\u7684\u5BAE\u5EF7\u751F\u6D3B\u4E86\u55CE\uFF1F"
   optionCircle: "\u662F"
   optionCross: "\u5426"
-  circleDescription: "\u662F"
-  crossDescription: "\u5426"
+  circleDescription: "\u958B\u59CB"
+  crossDescription: "\u4E0D\u958B\u59CB"
   circleWeights: []
   crossWeights: []
   isCutcene: 0

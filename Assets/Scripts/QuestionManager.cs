@@ -25,6 +25,9 @@ namespace DreamOfRedMansion
         private List<QuestionData> _questions;
 
         bool answer = false;
+
+        bool isCurrentQuestionCutscene;
+
         public IEnumerator RunQuestionFlow(Action onComplete)
         {
             if (questionSet == null)
@@ -51,6 +54,7 @@ namespace DreamOfRedMansion
             questionPanelController.ShowQuestion(question);
             if (!question.isCutcene)
             {
+                isCurrentQuestionCutscene = false;
                 answer = false;
                 yield return new WaitForSeconds(questionDuration);
 
@@ -66,21 +70,29 @@ namespace DreamOfRedMansion
             }
             else
             {
+                isCurrentQuestionCutscene = true;
                 Debug.Log($"[QuestionManager] 顯示過場：「{question.questionTitle}」");
                 yield return new WaitForSeconds(questionDuration);
             }
         }
         public void SetAnswer(bool value)
         {
-            if (value)
+            if (!isCurrentQuestionCutscene)
             {
-                groundEffectController.selectCircle();
+                if (value)
+                {
+                    groundEffectController.selectCircle();
+                }
+                else
+                {
+                    groundEffectController.selectCross();
+                }
+                answer = value;
             }
             else
             {
-                groundEffectController.selectCross();
+                groundEffectController.SetAllActiveFalse();
             }
-            answer = value;
             //Debug.Log($"answer：{answer}");
         }
         private void Update()

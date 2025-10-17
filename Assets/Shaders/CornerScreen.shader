@@ -12,7 +12,10 @@ Shader "FiveGenCar/CornerScreen"
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        //Tags { "RenderType"="Opaque" }
+        Tags { "Queue"="Transparent" "RenderType"="Transparent" }
+        Blend SrcAlpha OneMinusSrcAlpha
+        ZWrite Off
         //LOD 100
 
         Pass
@@ -60,8 +63,10 @@ Shader "FiveGenCar/CornerScreen"
 
             fixed4 frag (v2f i) : SV_Target
             {
+                float zoom = 2.2;
                 float ratio = _Width / _Height;
                 float2 HorizontalProjection = float2(i.worldPos.x / ratio, i.worldPos.y);
+                HorizontalProjection /= zoom;
                 HorizontalProjection += 0.5;
                 float adj = abs(_CamPosZ-i.worldPos.z);
                 float2 opp = float2((i.worldPos.x-_CamPosX) / ratio, (i.worldPos.y-_CamPosY));
@@ -71,21 +76,23 @@ Shader "FiveGenCar/CornerScreen"
                 {
                     HorizontalProjection += offset; // 3D Mapping
                 }
+
                 fixed4 col = tex2D(_MainTex, HorizontalProjection);
+
                 // apply fog
                 //UNITY_APPLY_FOG(i.fogCoord, col);
                 if(_Mode == 1)
                 {
-                    if (abs(i.worldPos.x) > 0.4 * ratio - abs(offset.x) || abs(i.worldPos.y) > 0.5 - abs(offset.y)) // 3D Mapping
+                    if (abs(i.worldPos.x) > (0.4 * ratio - abs(offset.x)) * zoom || abs(i.worldPos.y) > (0.5 - abs(offset.y)) * zoom) // 3D Mapping
                     {
-                        return fixed4(0, 0, 0, 1);
+                        return fixed4(0, 0, 0, 0);
                     }
                 }
                 else
                 {
                     if (abs(i.worldPos.x) > 0.5 * ratio || abs(i.worldPos.y) > 0.5) // 2D Mapping
                     {
-                        return fixed4(0, 0, 0, 1);
+                        return fixed4(0, 0, 0, 0);
                     }
                 }
                 return col;

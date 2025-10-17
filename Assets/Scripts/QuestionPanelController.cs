@@ -59,10 +59,16 @@ namespace DreamOfRedMansion
                     questionText.text = question.questionText;
 
                 if (positiveAnswerText != null)
-                    positiveAnswerText.text = $"{question.optionCircle}¡G{question.circleDescription}";
+                {
+                    //positiveAnswerText.text = $"{question.optionCircle}¡G{question.circleDescription}";
+                    positiveAnswerText.text = $"{question.circleDescription}";
+                }
 
                 if (negativeAnswerText != null)
-                    negativeAnswerText.text = $"{question.optionCross}¡G{question.crossDescription}";
+                {
+                    //negativeAnswerText.text = $"{question.optionCross}¡G{question.crossDescription}";
+                    negativeAnswerText.text = $"{question.crossDescription}";
+                }
             }
 
             if (useFadeIn)

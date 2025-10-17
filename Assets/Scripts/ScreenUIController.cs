@@ -27,6 +27,7 @@ namespace DreamOfRedMansion
         public Text resultDescriptionText;
         public Image resultImage;
 
+        public IdlePanelController idlePanelController;
         private void Awake()
         {
             // 啟動時先顯示 Idle 畫面
@@ -35,15 +36,14 @@ namespace DreamOfRedMansion
 
         public void ShowIdleScreen()
         {
-            RevealIdel();
             SetActivePanel(idlePanel);
+            idlePanelController?.OnIdleEnter();
             Debug.Log("[ScreenUI] 顯示 Idle 畫面");
         }
 
         public void ShowQuestion(string questionText = null)
         {
-            StartCoroutine(FadeOutIdle(2));
-            //SetActivePanel(questionPanel);
+            SetActivePanel(questionPanel);
 
             // 如果有題目文字，印出（未接UI文字前以Log示意）
             if (!string.IsNullOrEmpty(questionText))
@@ -90,55 +90,9 @@ namespace DreamOfRedMansion
             if (questionPanel != null) questionPanel.SetActive(false);
             if (resultPanel != null) resultPanel.SetActive(false);
             //if (scrollPanel != null) scrollPanel.SetActive(false);
-            
 
             if (targetPanel != null) targetPanel.SetActive(true);
             //if (targetPanel == questionPanel) resultPanel.SetActive(true);
-        }
-        private void RevealIdel()
-        {
-            if (idlePanel == null) return;
-            var rawImage = idlePanel.GetComponent<RawImage>();
-            if (rawImage == null)
-            {
-                Debug.LogWarning("[ScreenUI] IdlePanel 上找不到 RawImage，無法淡出。");
-                return;
-            }
-            Color color = rawImage.color;
-            color.a = 1;
-            rawImage.color = color;
-        }
-        private IEnumerator FadeOutIdle(float duration = 1f)
-        {
-            questionPanel.SetActive(true);
-            if (idlePanel == null) yield break;
-
-            var rawImage = idlePanel.GetComponent<RawImage>();
-            if (rawImage == null)
-            {
-                Debug.LogWarning("[ScreenUI] IdlePanel 上找不到 RawImage，無法淡出。");
-                yield break;
-            }
-
-            Color color = rawImage.color;
-            float startAlpha = color.a;
-            float time = 0f;
-
-            // 線性漸變 alpha
-            while (time < duration)
-            {
-                time += Time.deltaTime;
-                float t = Mathf.Clamp01(time / duration);
-                color.a = Mathf.Lerp(startAlpha, 0f, t);
-                rawImage.color = color;
-                yield return null;
-            }
-
-            // 確保最後完全透明
-            color.a = 0f;
-            rawImage.color = color;
-            //SetActivePanel(questionPanel);
-            idlePanel.SetActive(false);
         }
     }
 }

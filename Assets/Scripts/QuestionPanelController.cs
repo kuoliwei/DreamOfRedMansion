@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using DreamOfRedMansion.Data;
+using TMPro;
 
 namespace DreamOfRedMansion
 {
@@ -18,24 +19,27 @@ namespace DreamOfRedMansion
         public Text questionText;
 
         [Tooltip("顯示肯定答案的文字區塊 (是 / 圈)")]
-        public Text positiveAnswerText;
+        public TMP_Text positiveAnswerText;
+        private string positiveAnswerTemp;
 
         [Tooltip("顯示否定答案的文字區塊 (否 / 叉)")]
-        public Text negativeAnswerText;
+        public TMP_Text negativeAnswerText;
+        private string negativeAnswerTemp;
 
         [Header("動畫或特效（可選）")]
         [Tooltip("是否啟用文字淡入效果")]
         public bool useFadeIn = false;
 
-        private CanvasGroup canvasGroup;
+        [Header("UI 容器 (可選)")]
+        [Tooltip("控制淡入的目標 UI Panel (需有 CanvasGroup)")]
+        [SerializeField] private CanvasGroup canvasGroup;
 
+        [Header("確認選擇用的紅色圈圈")]
+        [SerializeField] private GameObject selectCircle_positive;
+        [SerializeField] private GameObject selectCircle_negative;
         private void Awake()
         {
-            canvasGroup = GetComponent<CanvasGroup>();
-            if (canvasGroup == null)
-            {
-                canvasGroup = gameObject.AddComponent<CanvasGroup>();
-            }
+
         }
 
         /// <summary>
@@ -50,9 +54,6 @@ namespace DreamOfRedMansion
                 return;
             }
 
-            if (contextText != null)
-                contextText.text = question.contextText;
-
             if (!question.isCutcene)
             {
                 if (questionText != null)
@@ -62,17 +63,28 @@ namespace DreamOfRedMansion
                 {
                     //positiveAnswerText.text = $"{question.optionCircle}：{question.circleDescription}";
                     positiveAnswerText.text = $"{question.circleDescription}";
+                    positiveAnswerTemp = $"{question.circleDescription}";
                 }
 
                 if (negativeAnswerText != null)
                 {
                     //negativeAnswerText.text = $"{question.optionCross}：{question.crossDescription}";
                     negativeAnswerText.text = $"{question.crossDescription}";
+                    negativeAnswerTemp = $"{question.crossDescription}";
                 }
             }
-
-            if (useFadeIn)
-                StartCoroutine(FadeIn());
+            else
+            {
+                if (contextText != null)
+                    contextText.text = question.contextText;
+                // 明確清空文字與暫存，避免被重設
+                if (positiveAnswerText != null) positiveAnswerText.text = "";
+                if (negativeAnswerText != null) negativeAnswerText.text = "";
+                positiveAnswerTemp = "";
+                negativeAnswerTemp = "";
+            }
+            //if (useFadeIn)
+            //    StartCoroutine(FadeIn());
         }
 
         /// <summary>
@@ -86,7 +98,7 @@ namespace DreamOfRedMansion
             if (negativeAnswerText != null) negativeAnswerText.text = "";
         }
 
-        private System.Collections.IEnumerator FadeIn()
+        public System.Collections.IEnumerator FadeIn()
         {
             canvasGroup.alpha = 0;
             float t = 0f;
@@ -97,6 +109,70 @@ namespace DreamOfRedMansion
                 yield return null;
             }
             canvasGroup.alpha = 1;
+        }
+        public System.Collections.IEnumerator FadeOut()
+        {
+            if (canvasGroup == null)
+            {
+                Debug.LogWarning("[QuestionPanelController] 未指定 fadeTarget，淡出略過。");
+                yield break;
+            }
+
+            float t = 0f;
+            while (t < 1f)
+            {
+                t += Time.deltaTime * 2f; // 淡出速度，可調
+                canvasGroup.alpha = Mathf.Lerp(1, 0, t);
+                yield return null;
+            }
+            canvasGroup.alpha = 0;
+        }
+        public void ShowSelectCircle(bool answer)
+        {
+            if (answer)
+            {
+                selectCircle_positive.SetActive(true);
+                selectCircle_negative.SetActive(false);
+            }
+            else
+            {
+                selectCircle_positive.SetActive(false);
+                selectCircle_negative.SetActive(true);
+            }
+        }
+        public void HideSelectCircle()
+        {
+            selectCircle_positive.SetActive(false);
+            selectCircle_negative.SetActive(false);
+        }
+        public void SetAnswer(bool answer)
+        {
+            if (answer)
+            {
+                positiveAnswerText.rectTransform.localScale = new Vector3(1.3f, 1.3f, 1);
+                negativeAnswerText.rectTransform.localScale = new Vector3(1, 1, 1);
+
+                positiveAnswerText.text = AddBoldAndUnderline(positiveAnswerTemp);
+                negativeAnswerText.text = negativeAnswerTemp;
+            }
+            else
+            {
+                positiveAnswerText.rectTransform.localScale = new Vector3(1, 1, 1);
+                negativeAnswerText.rectTransform.localScale = new Vector3(1.3f, 1.3f, 1);
+                positiveAnswerText.text = positiveAnswerTemp;
+                negativeAnswerText.text = AddBoldAndUnderline(negativeAnswerTemp);
+            }
+        }
+        public void NonSelect()
+        {
+            positiveAnswerText.rectTransform.localScale = new Vector3(1, 1, 1);
+            negativeAnswerText.rectTransform.localScale = new Vector3(1, 1, 1);
+            positiveAnswerText.text = positiveAnswerTemp;
+            negativeAnswerText.text = negativeAnswerTemp;
+        }
+        public string AddBoldAndUnderline(string content)
+        {
+            return $"<b><u>{content}</u></b>";
         }
     }
 }

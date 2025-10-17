@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 465c5c77649d16c4283fd556ee0ef198, type: 3}
   m_Name: "\u79E6\u53EF\u537F"
   m_EditorClassIdentifier: 
-  answerPattern: 1011
+  answerPattern: 0011
   characterName: "\u79E6\u53EF\u537F"
   title: "\u5145\u6EFF\u795E\u79D8\u7684\u7F8E\u9E97\u5973\u5B50\r"
   Introduction: "\u5167\u5411\u3001\u654F\u611F\uFF0C\u5E38\u5E38\u6C89\u6D78\u65BC\u5167\u5FC3\u7684\u4E16\u754C\u4E2D\uFF0C\u5C0D\u4EBA\u751F\u6709\u8457\u60B2\u5929\u61AB\u4EBA\u7684\u601D\u8003\uFF0C\u4E26\u4E14\u7E3D\u662F\u70BA\u4ED6\u4EBA\u8457\u60F3\u3002\r\r"

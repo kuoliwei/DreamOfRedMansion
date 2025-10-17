@@ -13,7 +13,6 @@ namespace DreamOfRedMansion
         public GroundEffectController groundEffect;
         public NoseAnswerDetector noseAnswerDetector;
         public GroundEffectController groundEffectController;
-        public IdleVideoPlayer idleVideoPlayer;
 
         private GameStateMachine _stateMachine;
 
@@ -38,9 +37,6 @@ namespace DreamOfRedMansion
 
         private void Start()
         {
-            // Idle 狀態影片播放器初始化
-            idleVideoPlayer?.Initialize(_stateMachine);
-
             // 所有事件訂閱完成後才廣播初始狀態
             _stateMachine.Bootstrap();
         }

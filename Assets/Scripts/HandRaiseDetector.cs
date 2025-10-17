@@ -16,6 +16,7 @@ public class HandRaiseDetector : MonoBehaviour
     public System.Action OnHandsRaised;
 
     private bool _isActive = false;            // 只在 Idle 才啟動
+    public bool externalLock = false; // 外部控制是否允許偵測（例如影片播放時鎖住）
     private float _holdAccum = 0f;             // 已累積的有效時間
     private float _lastValidTs = -1f;          // 上一筆「有效」資料到達時間（Time.time）
     private bool _hasTriggered = false;
@@ -39,7 +40,8 @@ public class HandRaiseDetector : MonoBehaviour
     /// </summary>
     public void UpdateFrame(FrameSample frame)
     {
-        if (!_isActive || frame == null || frame.persons == null || frame.persons.Count == 0)
+        Debug.Log($"_isActive:{_isActive},externalLock:{externalLock}");
+        if (!_isActive || frame == null || frame.persons == null || frame.persons.Count == 0 || externalLock)
             return;
 
         currentFrame = frame;

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using DreamOfRedMansion.Data;
 
@@ -15,6 +16,7 @@ namespace DreamOfRedMansion
 
         [Tooltip("結果顯示秒數")]
         public float displayDuration = 20f;
+        public Text countdown;
 
         public IEnumerator RunResultPhase(string answerPattern, System.Action onComplete)
         {
@@ -40,8 +42,23 @@ namespace DreamOfRedMansion
                     screenUI.UpdateResultContent(result.characterName, result.title, result.Introduction, result.description, result.resultImage);
 
                 Debug.Log($"[ResultCalculator] 顯示角色：{result.characterName}");
+                float timer = displayDuration;
+                if (countdown != null)
+                    countdown.gameObject.SetActive(true);
 
-                yield return new WaitForSeconds(displayDuration);
+                while (timer > 0f)
+                {
+                    if (countdown != null)
+                        countdown.text = Mathf.CeilToInt(timer).ToString();
+                    yield return null;
+                    timer -= Time.deltaTime;
+                }
+
+                if (countdown != null)
+                {
+                    countdown.text = "0";
+                    countdown.gameObject.SetActive(false);
+                }
             }
             yield return new WaitForSeconds(0.1f);
             onComplete?.Invoke();

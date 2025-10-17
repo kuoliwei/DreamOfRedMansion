@@ -20,8 +20,8 @@ namespace DreamOfRedMansion
         [Header("地板 是 或 否 狀態切換用物件")]
         public GameObject circle_black_bg;
         public GameObject cross_black_bg;
-        public GameObject selectCircle_positive;
-        public GameObject selectCircle_negative;
+        //public GameObject selectCircle_positive;
+        //public GameObject selectCircle_negative;
 
         [Tooltip("是否輸出除錯訊息")]
         public bool debugLog = true;
@@ -37,8 +37,8 @@ namespace DreamOfRedMansion
             {
                 circle_black_bg.SetActive(false);
                 cross_black_bg.SetActive(false);
-                selectCircle_positive.SetActive(false);
-                selectCircle_negative.SetActive(false);
+                //selectCircle_positive.SetActive(false);
+                //selectCircle_negative.SetActive(false);
             }
 
             if (debugLog)
@@ -74,8 +74,8 @@ namespace DreamOfRedMansion
             {
                 circle_black_bg.SetActive(true);
                 cross_black_bg.SetActive(false);
-                selectCircle_positive.SetActive(true);
-                selectCircle_negative.SetActive(false);
+                //selectCircle_positive.SetActive(true);
+                //selectCircle_negative.SetActive(false);
             }
         }
         public void selectCross()
@@ -84,16 +84,39 @@ namespace DreamOfRedMansion
             {
                 circle_black_bg.SetActive(false);
                 cross_black_bg.SetActive(true);
-                selectCircle_positive.SetActive(false);
-                selectCircle_negative.SetActive(true);
+                //selectCircle_positive.SetActive(false);
+                //selectCircle_negative.SetActive(true);
+            }
+        }
+        public void SetAnswer(bool answer)
+        {
+            if (answer)
+            {
+                if (_isActive)
+                {
+                    circle_black_bg.SetActive(true);
+                    cross_black_bg.SetActive(false);
+                    //selectCircle_positive.SetActive(true);
+                    //selectCircle_negative.SetActive(false);
+                }
+            }
+            else
+            {
+                if (_isActive)
+                {
+                    circle_black_bg.SetActive(false);
+                    cross_black_bg.SetActive(true);
+                    //selectCircle_positive.SetActive(false);
+                    //selectCircle_negative.SetActive(true);
+                }
             }
         }
         public void SetAllActiveFalse()
         {
             circle_black_bg.SetActive(false);
             cross_black_bg.SetActive(false);
-            selectCircle_positive.SetActive(false);
-            selectCircle_negative.SetActive(false);
+            //selectCircle_positive.SetActive(false);
+            //selectCircle_negative.SetActive(false);
         }
     }
 }

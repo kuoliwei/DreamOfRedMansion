@@ -40,7 +40,7 @@ public class HandRaiseDetector : MonoBehaviour
     /// </summary>
     public void UpdateFrame(FrameSample frame)
     {
-        Debug.Log($"_isActive:{_isActive},externalLock:{externalLock}");
+        if (debugLog) Debug.Log($"_isActive:{_isActive},externalLock:{externalLock}");
         if (!_isActive || frame == null || frame.persons == null || frame.persons.Count == 0 || externalLock)
             return;
 

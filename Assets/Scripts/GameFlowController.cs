@@ -6,13 +6,14 @@ namespace DreamOfRedMansion
     public class GameFlowController : MonoBehaviour
     {
         [Header("References")]
-        public HandRaiseDetector handRaiseDetector;
-        public QuestionManager questionManager;
-        public ResultCalculator resultCalculator;
-        public ScreenUIController screenUI;
-        public GroundEffectController groundEffect;
-        public NoseAnswerDetector noseAnswerDetector;
-        public GroundEffectController groundEffectController;
+        [SerializeField] private HandRaiseDetector handRaiseDetector;
+        [SerializeField] private QuestionManager questionManager;
+        [SerializeField] private ResultCalculator resultCalculator;
+        [SerializeField] private ScreenUIController screenUI;
+        [SerializeField] private GroundEffectController groundEffect;
+        [SerializeField] private NoseAnswerDetector noseAnswerDetector;
+        [SerializeField] private GroundEffectController groundEffectController;
+        [SerializeField] private AudioController audioController;
 
         private GameStateMachine _stateMachine;
 
@@ -49,10 +50,12 @@ namespace DreamOfRedMansion
             switch (newState)
             {
                 case GameState.Idle:
+                    audioController.StopBGM();
                     EnterIdle();
                     break;
 
                 case GameState.Question:
+                    audioController.PlayQuestionBGM();
                     screenUI.ShowQuestion();
                     StartCoroutine(questionManager.RunQuestionFlow(() =>
                     {
@@ -62,6 +65,7 @@ namespace DreamOfRedMansion
 
                 case GameState.Result:
                     screenUI.ShowResult();
+                    audioController.StopBGM();
                     StartCoroutine(resultCalculator.RunResultPhase(questionManager.collectedAnswers, () =>
                     {
                         _stateMachine.ChangeState(GameState.Idle);

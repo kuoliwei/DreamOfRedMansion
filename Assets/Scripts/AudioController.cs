@@ -22,10 +22,13 @@ public class AudioController : MonoBehaviour
     /// </summary>
     public void PlayQuestionBGM()
     {
-        // 若有上次殘留的協程就停止
+        if (debugLog) Debug.Log($"PlayQuestionBGM invoke");
+        //若有上次殘留的協程就停止
         if (questionRoutine != null)
             StopCoroutine(questionRoutine);
         questionRoutine = StartCoroutine(PlayQuestionSequence());
+
+        //bgmSource.Play();
     }
 
     /// <summary>
@@ -33,15 +36,18 @@ public class AudioController : MonoBehaviour
     /// </summary>
     public void StopBGM()
     {
-        if (questionRoutine != null)
-        {
-            StopCoroutine(questionRoutine);
-            questionRoutine = null;
-        }
+        if (debugLog) Debug.Log($"StopBGM invoke");
+        //if (questionRoutine != null)
+        //{
+        //    StopCoroutine(questionRoutine);
+        //    questionRoutine = null;
+        //}
 
-        if (fadeCoroutine != null)
-            StopCoroutine(fadeCoroutine);
-        fadeCoroutine = StartCoroutine(FadeOut());
+        //if (fadeCoroutine != null)
+        //    StopCoroutine(fadeCoroutine);
+        //fadeCoroutine = StartCoroutine(FadeOut());
+
+        bgmSource.Stop();
     }
 
     private IEnumerator PlayQuestionSequence()
@@ -61,7 +67,6 @@ public class AudioController : MonoBehaviour
         yield return new WaitUntil(() => bgmSource.isPlaying);
         if (debugLog) Debug.Log($"開始播放第二首，允許loop:{bgmSource.loop}");
     }
-
     private IEnumerator FadeIn(AudioClip clip)
     {
         bgmSource.Stop();

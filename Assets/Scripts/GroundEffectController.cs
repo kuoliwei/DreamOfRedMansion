@@ -1,5 +1,6 @@
 using DreamOfRedMansion.Core;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace DreamOfRedMansion
 {
@@ -20,6 +21,7 @@ namespace DreamOfRedMansion
         [Header("地板 是 或 否 狀態切換用物件")]
         public GameObject circle_black_bg;
         public GameObject cross_black_bg;
+        public GameObject BlackGround;
         //public GameObject selectCircle_positive;
         //public GameObject selectCircle_negative;
 
@@ -35,10 +37,18 @@ namespace DreamOfRedMansion
             _isActive = (newState == GameState.Question);
             if (!_isActive)
             {
+                if(newState == GameState.Idle)
+                {
+                    BlackGround.SetActive(true);
+                }
                 circle_black_bg.SetActive(false);
                 cross_black_bg.SetActive(false);
                 //selectCircle_positive.SetActive(false);
                 //selectCircle_negative.SetActive(false);
+            }
+            else
+            {
+                BlackGround.SetActive(false);
             }
 
             if (debugLog)

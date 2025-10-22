@@ -11,10 +11,11 @@ namespace DreamOfRedMansion
     public class IdlePanelController : MonoBehaviour
     {
         [Header("組件參考")]
-        public RawImage rawImage;               // 影片播放用
-        public CanvasGroup imageGroup;          // 開場封面群組（含子物件）
-        public IdleVideoPlayer idleVideoPlayer; // 負責實際播放影片
-        public HandRaiseDetector handRaiseDetector; // 體驗者手舉偵測器
+        [SerializeField] private RawImage rawImage;               // 影片播放用
+        [SerializeField] private CanvasGroup imageGroup;          // 開場封面群組（含子物件）
+        [SerializeField] private IdleVideoPlayer idleVideoPlayer; // 負責實際播放影片
+        [SerializeField] private HandRaiseDetector handRaiseDetector; // 體驗者手舉偵測器
+        [SerializeField] private AudioController audioController;
 
         [Header("淡入淡出設定")]
         public float fadeDuration = 1f;
@@ -23,7 +24,7 @@ namespace DreamOfRedMansion
 
         private void Awake()
         {
-            if (idleVideoPlayer != null)
+            if (idleVideoPlayer != null) { }
                 idleVideoPlayer.OnVideoFinished += HandleVideoFinished;
         }
 
@@ -39,7 +40,7 @@ namespace DreamOfRedMansion
         public void OnIdleEnter()
         {
             StopAllCoroutines();
-
+            audioController.StopBGM();
             // 鎖住偵測直到影片結束
             if (handRaiseDetector != null)
             {
@@ -70,7 +71,9 @@ namespace DreamOfRedMansion
         /// </summary>
         private void HandleVideoFinished()
         {
+            Debug.Log("HandleVideoFinished invoke");
             _isPlayingVideo = false;
+            audioController.PlayQuestionBGM();
             StartCoroutine(FadeOutRawImageThenShowImage());
         }
 

@@ -30,6 +30,8 @@ namespace DreamOfRedMansion
 
         bool isCurrentQuestionCutscene;
 
+        bool isAnswerSelected = false;
+
         public IEnumerator RunQuestionFlow(Action onComplete)
         {
             if (questionSet == null)
@@ -91,7 +93,9 @@ namespace DreamOfRedMansion
                     Debug.Log($"[QuestionManager] 題目「{question.questionTitle}」答案：{(answer ? "是" : "否")} (未記錄)");
                 }
                 questionPanelController.ShowSelectCircle(answer);
+                isAnswerSelected = true;
                 yield return new WaitForSeconds(2);
+                isAnswerSelected = false;
             }
             else
             {
@@ -107,9 +111,12 @@ namespace DreamOfRedMansion
         {
             if (!isCurrentQuestionCutscene)
             {
-                answer = value;
-                groundEffectController.SetAnswer(answer);
-                questionPanelController.SetAnswer(answer);
+                if (!isAnswerSelected)
+                {
+                    answer = value;
+                    groundEffectController.SetAnswer(answer);
+                    questionPanelController.SetAnswer(answer);
+                }
             }
             else
             {

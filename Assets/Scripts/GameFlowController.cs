@@ -13,7 +13,7 @@ namespace DreamOfRedMansion
         [SerializeField] private GroundEffectController groundEffect;
         [SerializeField] private NoseAnswerDetector noseAnswerDetector;
         [SerializeField] private GroundEffectController groundEffectController;
-        [SerializeField] private AudioController audioController;
+        //[SerializeField] private AudioController audioController;
 
         private GameStateMachine _stateMachine;
 
@@ -50,12 +50,12 @@ namespace DreamOfRedMansion
             switch (newState)
             {
                 case GameState.Idle:
-                    audioController.StopBGM();
+                    //audioController.StopBGM();
                     EnterIdle();
                     break;
 
                 case GameState.Question:
-                    audioController.PlayQuestionBGM();
+                    //audioController.PlayQuestionBGM();
                     screenUI.ShowQuestion();
                     StartCoroutine(questionManager.RunQuestionFlow(() =>
                     {
@@ -65,7 +65,7 @@ namespace DreamOfRedMansion
 
                 case GameState.Result:
                     screenUI.ShowResult();
-                    audioController.StopBGM();
+                    //audioController.StopBGM();
                     StartCoroutine(resultCalculator.RunResultPhase(questionManager.collectedAnswers, () =>
                     {
                         _stateMachine.ChangeState(GameState.Idle);

@@ -38,6 +38,7 @@ namespace DreamOfRedMansion
             if (!Directory.Exists(videoPath))
             {
                 Debug.LogWarning($"[IdleVideoPlayer] 指定資料夾不存在: {videoPath}");
+                OnVideoFinished?.Invoke(); // 若路徑不存在跳過影片播放繼續執行
                 return;
             }
 
@@ -45,6 +46,7 @@ namespace DreamOfRedMansion
             if (files.Length == 0)
             {
                 Debug.LogWarning("[IdleVideoPlayer] 找不到 mp4 影片檔");
+                OnVideoFinished?.Invoke(); // 若影片不存在跳過影片播放繼續執行
                 return;
             }
 

@@ -6670,7 +6670,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "<b>\u9650\u6642\u512A\u60E0\u4EE3\u78BC\uFF1AGGGGG\r</b>\n\u300A\u5922\u7D05\u6A13\uFF0E\u4E7E\u9686\u8207\u548C\u73C5\u300B\r\n\u81FA\u5317\uFF5C11/14
+  m_Text: "<b>\u9650\u6642\u512A\u60E0\u4EE3\u78BC\uFF1A2015G\r</b>\n\u300A\u5922\u7D05\u6A13\uFF0E\u4E7E\u9686\u8207\u548C\u73C5\u300B\r\n\u81FA\u5317\uFF5C11/14
     - 11/16 \u570B\u5BB6\u6232\u5287\u9662\r\n\u81FA\u4E2D\uFF5C11/29 - 11/30 \u570B\u5BB6\u6B4C\u5287\u9662\u5927\u5287\u9662\r"
 --- !u!222 &1271694771
 CanvasRenderer:
